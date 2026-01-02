@@ -123,7 +123,9 @@ function loadLevel(index) {
 
   // Drop after 0.5s
   setTimeout(() => {
-    if (ball) Body.setStatic(ball, false);
+    if (ball) {
+      Body.setStatic(ball, false);
+    }
   }, 500);
 
   // Update UI

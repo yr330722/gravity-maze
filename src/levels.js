@@ -12,7 +12,7 @@ export const levels = [
         goalPos: { x: cx + 300, y: height - 100 },
         obstacles: [
             // A floor gap
-            { x: cx, y: height, w: width / 2, h: 50, angle: 0 }
+            { x: cx, y: height, w: width, h: 50, angle: 0 }
         ]
     },
     {

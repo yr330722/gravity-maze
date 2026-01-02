@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gravity Maze - Cyberpunk Physics</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Game Container -->
+    <div id="app">
+      <div id="ui-layer">
+        <h1 class="game-title">GRAVITY <span class="highlight">MAZE</span></h1>
+        <div class="controls">
+          <div class="instruction">Draw lines to guide the ball to the portal.</div>
+          <button id="btn-reset" class="btn">Reset Ball</button>
+          <button id="btn-clear" class="btn btn-secondary">Clear Lines</button>
+        </div>
+        <div id="status-display"></div>
+      </div>
+      <!-- Matter.js Canvas will be appended here or to body -->
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

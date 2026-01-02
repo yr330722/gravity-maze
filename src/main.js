@@ -294,4 +294,14 @@ Events.on(engine, 'beforeUpdate', () => {
       particleManager.createTrail(ball.position.x, ball.position.y, '#ff0033');
     }
   }
+
+  // Safety: Reset ball if it falls out of world
+  if (ball && ball.position.y > window.innerHeight + 100) {
+    Body.setPosition(ball, levels[currentLevelIndex].ballPos);
+    Body.setVelocity(ball, { x: 0, y: 0 });
+    Body.setStatic(ball, true);
+    setTimeout(() => {
+      if (ball) Body.setStatic(ball, false);
+    }, 500);
+  }
 });

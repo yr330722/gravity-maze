@@ -1,6 +1,6 @@
 import './style.css'
 import Matter from 'matter-js'
-import { levels } from './levels.js'
+import { getLevels } from './levels.js'
 import { audioManager } from './audio.js'
 
 // Module aliases
@@ -61,33 +61,34 @@ let ball = null;
 let goal = null;
 
 function loadLevel(index) {
+  const levels = getLevels();
   if (index >= levels.length) {
-    index = 0; // Loop back or show credits
+    index = 0;
   }
   particleManager.clear();
   currentLevelIndex = index;
   const levelData = levels[index];
+
+  // Resize canvas to ensure full screen before positioning
+  render.canvas.width = window.innerWidth;
+  render.canvas.height = window.innerHeight;
+
   isLevelCompleted = false;
   uiStatus.classList.remove('active');
   engine.timing.timeScale = 1;
 
   // Clear World
   Composite.clear(world);
-  Engine.clear(engine); // Clear events to prevents duplicates if not careful, but we handle events globally
-
-  // Re-add boundaries (always present)
-  // Note: we might want custom boundaries per level, but global is fine for now
-  // Actually, let's just use level obstacles.
+  Engine.clear(engine);
 
   // 1. Create Obstacles
   const newBodies = [];
 
-  // Static Obstacles
   levelData.obstacles.forEach(obs => {
     newBodies.push(Bodies.rectangle(obs.x, obs.y, obs.w, obs.h, {
       isStatic: true,
-      angle: obs.angle,
-      render: { fillStyle: '#444' },
+      angle: obs.angle || 0,
+      render: { fillStyle: obs.render?.fillStyle || '#444' },
       label: 'obstacle'
     }));
   });
@@ -251,7 +252,8 @@ function completeLevel() {
   engine.timing.timeScale = 0.2; // Slow mo
 
   setTimeout(() => {
-    loadLevel(currentLevelIndex + 1);
+    const nextIndex = currentLevelIndex + 1;
+    loadLevel(nextIndex);
   }, 2000);
 }
 
@@ -296,10 +298,13 @@ Events.on(engine, 'beforeUpdate', () => {
   }
 
   // Safety: Reset ball if it falls out of world
-  if (ball && ball.position.y > window.innerHeight + 100) {
-    Body.setPosition(ball, levels[currentLevelIndex].ballPos);
+  if (ball && ball.position.y > window.innerHeight + 200) {
+    const levelData = getLevels()[currentLevelIndex];
+    Body.setPosition(ball, levelData.ballPos);
     Body.setVelocity(ball, { x: 0, y: 0 });
+    Body.setAngularVelocity(ball, 0);
     Body.setStatic(ball, true);
+
     setTimeout(() => {
       if (ball) Body.setStatic(ball, false);
     }, 500);

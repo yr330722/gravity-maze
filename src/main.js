@@ -9,7 +9,8 @@ const Engine = Matter.Engine,
   Runner = Matter.Runner,
   Bodies = Matter.Bodies,
   Composite = Matter.Composite,
-  Events = Matter.Events;
+  Events = Matter.Events,
+  Body = Matter.Body;
 
 // Game State
 let currentLevelIndex = 0;
@@ -108,6 +109,7 @@ function loadLevel(index) {
   ball = Bodies.circle(levelData.ballPos.x, levelData.ballPos.y, 15, {
     restitution: 0.6,
     friction: 0.001,
+    isStatic: true, // Pause initially
     render: {
       fillStyle: '#ff0033',
       strokeStyle: '#ffffff',
@@ -118,6 +120,11 @@ function loadLevel(index) {
   newBodies.push(ball);
 
   Composite.add(world, newBodies);
+
+  // Drop after 0.5s
+  setTimeout(() => {
+    if (ball) Body.setStatic(ball, false);
+  }, 500);
 
   // Update UI
   document.getElementById('level-name').innerText = `LEVEL ${index + 1}: ${levelData.name}`;

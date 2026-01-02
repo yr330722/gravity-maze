@@ -123,7 +123,6 @@ function loadLevel(index) {
   ball = Bodies.circle(levelData.ballPos.x, levelData.ballPos.y, 15, {
     restitution: 0.6,
     friction: 0.001,
-    isStatic: true, // Pause initially
     render: {
       fillStyle: '#ff0033',
       strokeStyle: '#ffffff',
@@ -134,15 +133,6 @@ function loadLevel(index) {
   newBodies.push(ball);
 
   Composite.add(world, newBodies);
-
-  // Drop after 0.5s
-  dropTimer = setTimeout(() => {
-    if (ball) {
-      console.log("Releasing ball at", ball.position);
-      Body.setStatic(ball, false);
-    }
-    dropTimer = null;
-  }, 500);
 
   // Debug export
   window.ball = ball;
@@ -332,12 +322,10 @@ Events.on(engine, 'beforeUpdate', () => {
     Body.setPosition(ball, { x: safeX, y: safeY });
     Body.setVelocity(ball, { x: 0, y: 0 });
     Body.setAngularVelocity(ball, 0);
-    Body.setStatic(ball, true);
 
-    if (dropTimer) clearTimeout(dropTimer);
-    dropTimer = setTimeout(() => {
-      if (ball) Body.setStatic(ball, false);
+    if (dropTimer) {
+      clearTimeout(dropTimer);
       dropTimer = null;
-    }, 1000); // 1s wait on recovery
+    }
   }
 });

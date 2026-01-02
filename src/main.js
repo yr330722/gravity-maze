@@ -59,6 +59,7 @@ Runner.run(runner, engine);
 // --- Level Management ---
 let ball = null;
 let goal = null;
+let dropTimer = null; // Timer to release ball
 
 function loadLevel(index) {
   const levels = getLevels();
@@ -77,9 +78,21 @@ function loadLevel(index) {
   uiStatus.classList.remove('active');
   engine.timing.timeScale = 1;
 
+  // Clear existing timers
+  if (dropTimer) clearTimeout(dropTimer);
+
   // Clear World
-  Composite.clear(world);
-  Engine.clear(engine);
+  Composite.clear(world, false);
+
+  // Create Screen Boundaries
+  const thick = 100;
+  const worldWalls = [
+    Bodies.rectangle(window.innerWidth / 2, -thick / 2, window.innerWidth + thick * 2, thick, { isStatic: true, label: 'boundary', render: { visible: false } }),
+    Bodies.rectangle(window.innerWidth / 2, window.innerHeight + thick / 2, window.innerWidth + thick * 2, thick, { isStatic: true, label: 'boundary', render: { visible: false } }),
+    Bodies.rectangle(-thick / 2, window.innerHeight / 2, thick, window.innerHeight + thick * 2, { isStatic: true, label: 'boundary', render: { visible: false } }),
+    Bodies.rectangle(window.innerWidth + thick / 2, window.innerHeight / 2, thick, window.innerHeight + thick * 2, { isStatic: true, label: 'boundary', render: { visible: false } })
+  ];
+  Composite.add(world, worldWalls);
 
   // 1. Create Obstacles
   const newBodies = [];
@@ -123,11 +136,18 @@ function loadLevel(index) {
   Composite.add(world, newBodies);
 
   // Drop after 0.5s
-  setTimeout(() => {
+  dropTimer = setTimeout(() => {
     if (ball) {
+      console.log("Releasing ball at", ball.position);
       Body.setStatic(ball, false);
     }
+    dropTimer = null;
   }, 500);
+
+  // Debug export
+  window.ball = ball;
+  window.world = world;
+  window.engine = engine;
 
   // Update UI
   document.getElementById('level-name').innerText = `LEVEL ${index + 1}: ${levelData.name}`;
@@ -297,16 +317,27 @@ Events.on(engine, 'beforeUpdate', () => {
     }
   }
 
-  // Safety: Reset ball if it falls out of world
-  if (ball && ball.position.y > window.innerHeight + 200) {
-    const levelData = getLevels()[currentLevelIndex];
-    Body.setPosition(ball, levelData.ballPos);
+  // Safety: Reset ball if it falls out of world or becomes NaN
+  const safeLv = getLevels()[currentLevelIndex] || getLevels()[0];
+  const outY = window.innerHeight + 500;
+  const isOutOfBounds = ball && (ball.position.y > outY || ball.position.y < -1000 || ball.position.x < -1000 || ball.position.x > window.innerWidth + 1000);
+  const isInvalid = ball && (isNaN(ball.position.x) || isNaN(ball.position.y));
+
+  if (isOutOfBounds || isInvalid) {
+    const safeX = safeLv.ballPos.x;
+    const safeY = safeLv.ballPos.y;
+
+    console.warn("Ball lost or invalid. Recovering to:", safeX, safeY);
+
+    Body.setPosition(ball, { x: safeX, y: safeY });
     Body.setVelocity(ball, { x: 0, y: 0 });
     Body.setAngularVelocity(ball, 0);
     Body.setStatic(ball, true);
 
-    setTimeout(() => {
+    if (dropTimer) clearTimeout(dropTimer);
+    dropTimer = setTimeout(() => {
       if (ball) Body.setStatic(ball, false);
-    }, 500);
+      dropTimer = null;
+    }, 1000); // 1s wait on recovery
   }
 });

@@ -109,7 +109,7 @@ function loadLevel(index) {
     restitution: 0.6,
     friction: 0.001,
     render: {
-      fillStyle: '#00f3ff',
+      fillStyle: '#ff0033',
       strokeStyle: '#ffffff',
       lineWidth: 2
     },
@@ -221,7 +221,7 @@ Events.on(engine, 'collisionStart', (event) => {
       const contactX = (pair.bodyA.position.x + pair.bodyB.position.x) / 2;
       const contactY = (pair.bodyA.position.y + pair.bodyB.position.y) / 2;
 
-      particleManager.createBurst(contactX, contactY, '#00f3ff', Math.min(speed * 2, 20));
+      particleManager.createBurst(contactX, contactY, '#ff0033', Math.min(speed * 2, 20));
     }
 
     // Win Check
@@ -282,7 +282,7 @@ Events.on(engine, 'beforeUpdate', () => {
     // Only leave trail if moving fast enough
     // Add some randomness so it's not a solid line
     if (Math.random() > 0.5) {
-      particleManager.createTrail(ball.position.x, ball.position.y);
+      particleManager.createTrail(ball.position.x, ball.position.y, '#ff0033');
     }
   }
 });

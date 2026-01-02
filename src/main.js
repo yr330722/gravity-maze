@@ -73,6 +73,8 @@ function loadLevel(index) {
   // Resize canvas to ensure full screen before positioning
   render.canvas.width = window.innerWidth;
   render.canvas.height = window.innerHeight;
+  render.options.width = window.innerWidth;
+  render.options.height = window.innerHeight;
 
   isLevelCompleted = false;
   uiStatus.classList.remove('active');
@@ -285,6 +287,9 @@ btnClear.addEventListener('click', () => {
 window.addEventListener('resize', () => {
   render.canvas.width = window.innerWidth;
   render.canvas.height = window.innerHeight;
+  render.options.width = window.innerWidth;
+  render.options.height = window.innerHeight;
+  Render.setPixelRatio(render, window.devicePixelRatio);
 });
 
 // --- Particles Integration ---
